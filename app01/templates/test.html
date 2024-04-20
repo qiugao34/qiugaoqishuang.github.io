@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <base href="/">
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-3.4.1/css/bootstrap.css' %}">
+{#    <link rel="stylesheet" href="{% static 'css/index.css' %}">#}
+    <title>Title</title>
+    {% block css %}{% endblock %}
+    <style>
+        body {
+            background: url("../static/img/29.png") fixed no-repeat center center;
+            background-size: cover;
+        }
+        .mybtn{
+            {#display: block;#}
+            float: left;
+            margin: 20px 15px 15px 15px;
+            border: none;
+            background: none;
+            width: 255px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="container">
+    <button class="mybtn" onclick="window.location.href='/index/'"><img src="../static/img/边框1.png" alt="首页" width="100%"></button>
+    <button class="mybtn" onclick="window.location.href='/classify/show/'"><img src="../static/img/边框2.png" alt="初识本经" width="100%"></button>
+    <button class="mybtn" onclick="window.location.href='/taste/show/'"><img src="../static/img/边框3.png" alt="归经·性味" width="100%"></button>
+    <button class="mybtn" onclick="window.location.href='/usage/show/'"><img src="../static/img/边框4.png" alt="《本经》与《伤寒论》" width="100%"></button>
+</nav>
+{% block content %}{% endblock %}
+
+<script src="{% static 'js/code.jquery.com_jquery-3.7.0.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-3.4.1/js/bootstrap.js' %}"></script>
+<script src="{% static 'js/echarts.js' %}"></script>
+<script src="{% static 'js/echarts-wordcloud.js' %}"></script>
+{% block js %}{% endblock %}
+</body>
+</html>

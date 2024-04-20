@@ -1,0 +1,56 @@
+#stack_bar{
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
+    height: 450px;
+
+}
+.container .itd{
+    height: 250px;
+}
+.container .itd h3{
+    font-family: 楷体, sans-serif;
+    text-align: center;
+}
+.itd p{
+    font-size: 18px;
+    font-family: 楷体, sans-serif;
+}
+
+.container .itd .content{
+    display: inline-block;
+    margin: 0 22px 0 35px;
+    float: left;
+    height: 200px;
+    width: 45%;
+
+}
+
+.container .itd .content ul li{
+    list-style: none;
+    font-size: 16px;
+    font-family: 楷体, sans-serif;
+}
+.container h3{
+    text-align: center;
+    font-family: 隶书, sans-serif;
+    font-size: 36px;
+}
+.container .btn1{
+    margin-left: 115px;
+    background: none;
+    border: none;
+    font-family: 楷体, sans-serif;
+    font-size: 24px;
+}
+.interview{
+    display: block;
+    float: left;
+    width: 200px;
+    height: 200px;
+    font-size: 24px;
+    font-family: 楷体, sans-serif;
+}
+#Nightingale_Chart{
+    float: left;
+}

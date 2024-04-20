@@ -1,0 +1,370 @@
+{% extends "test.html" %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/3.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="container my_container">
+        <div class="introduction">
+            同《神农本草经》一样，《伤寒杂病论》同样是我国著名的传统医学著作，是一部论述外感病和内科杂病的医学典籍，其中共收录药方大约269附，使用药物约161种，其中《本经》中有记载的有121种。
+        </div>
+        <div id="bar" style="height: 400px;width: 710px ;float: left">></div>
+    </div>
+    <div class="container my_container">
+        <h3 id="amount"></h3>
+        <div id="pie" style="height: 400px;width: 100%"></div>
+        <div id="bar2" style="margin-top:20px;height: 450px;width: 100%;text-align: center;line-height: 450px;font-size: 32px"></div>
+        <div class="prescription">
+            <h3 id="title">药方</h3>
+            <table class="table1" border="1">
+                <thead>
+                <tr>
+                    <th>药方名</th>
+                    <th>使用药物详情</th>
+                </tr>
+                </thead>
+                <tbody id="prescription"></tbody>
+            </table>
+            <nav aria-label="Page navigation" class="nav1">
+                <ul id="pagination" class="pagination1"></ul>
+            </nav>
+
+        </div>
+    </div>
+
+
+
+
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        var myChart2 = null;
+        var myChart3 = null;
+        var page = 1;
+        var datalist = [];
+
+        function fun(datalist, page) {
+            {#console.log(page)#}
+            {#console.log(datalist)#}
+            if (typeof (datalist) === 'string') {
+                datalist = datalist.split(',')
+            }
+            console.log(datalist)
+            table(datalist, page)
+        }
+
+        function table(datalist, page) {
+
+            $.ajax({
+                url: '/prescription/table/',
+                type: "get",
+                dataType: "JSON",
+                traditional: true,
+                {#async: false,#}
+                data: {
+                    "datalist": JSON.stringify(datalist),
+                    "page": page
+                },
+                success: function (res) {
+                    var Ele = '';
+                    var obj1 = document.getElementById("prescription");
+                    var obj2 = document.getElementById("pagination")
+                    for (var i = 0; i < res.data.length; i++) {
+                        Ele += "<tr><td>" + res.data[i].prescriptionName + "</td><td>" + res.data[i].prescription + "</td></tr>"
+                    }
+                    obj1.innerHTML = Ele
+                    obj2.innerHTML = res.pageString
+                }
+            })
+
+        }
+
+        function transit(name) {
+            obj = document.getElementById("title")
+            if (name.length === 1) {
+                obj.innerText = name[0] + '药方'
+            } else {
+                obj.innerText = name[0] + '与' + name[1] + "搭配药方"
+            }
+        }
+
+        function amountTitle(amount) {
+            document.getElementById("amount").innerText = "出现频次为" + amount + "的药物"
+        }
+
+        $(function () {
+            initBar()
+            initPie('11~', '甘草')
+            initBar2('甘草')
+            transit(['甘草'])
+            table(['甘草'], 1)
+        })
+
+        function initBar() {
+            const myChart = echarts.init(document.getElementById('bar'));
+            const option = {
+                 title: {
+                    text: "各频次段出现的药物数量",
+                    x: 'center',
+                    y: 'top',
+                    textStyle: {
+                        fontSize: 20,
+                        fontFamily: '楷体',
+                    },
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow',
+                        shadowStyle: {
+                            opacity: 1,
+                            color: 'rgba(150,150,150,0.3)'
+                        }
+                    },
+                    formatter: '<p>药物出现频次为{b0}的有{c0}种</p><p style="font-size: 12px">点击柱状区域了解详情</p>',
+                    textStyle: {
+                        fontSize: 18,
+
+                    },
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: [],
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '',
+                        type: 'bar',
+                        barWidth: '60%',
+                        color: ['#D2691E', '#8B7E66', '#CDBE70', '#8B5A00', '#FAEBD7'],
+                        colorBy: 'data',
+                        data: []
+                    }
+                ]
+            }
+            $.ajax({
+                url: "/usage/amount/",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    option.xAxis[0].data = res.data1;
+                    option.series[0].data = res.data2;
+                    myChart.setOption(option)
+                }
+            })
+            myChart.on('click', function (params) {
+                if (params.name === '1') {
+                    initPie(params.name, '紫葳');
+                    initBar2('紫葳');
+                    transit(['紫葳'])
+                    table(['紫葳'], 1);
+                } else if (params.name === '2') {
+                    initPie(params.name, '竹叶');
+                    initBar2('竹叶');
+                    transit(['竹叶'])
+                    table(['竹叶'], 1);
+                } else if (params.name === '3~5') {
+                    initPie(params.name, '葛根');
+                    initBar2('葛根');
+                    transit(['葛根'])
+                    table(['葛根'], 1);
+                } else if (params.name === '6~10') {
+                    initPie(params.name, '知母');
+                    initBar2('知母');
+                    transit(['知母'])
+                    table(['知母'], 1);
+                } else {
+                    initPie(params.name, '甘草');
+                    initBar2('甘草');
+                    transit(['甘草'])
+                    table(['甘草'], 1);
+
+                }
+            })
+
+        }
+
+        function initPie(amount, textName) {
+            amountTitle(amount)
+            if (myChart2 != null && myChart2 !== "" && myChart2 !== undefined) {
+                myChart2.dispose();
+            }
+            myChart2 = echarts.init(document.getElementById('pie'));
+            var option = {
+                title: {
+                    text: textName,
+                    x: 'center',
+                    y: 'center',
+                    textStyle: {
+                        fontSize: 20,
+                        fontFamily: '楷体',
+                    },
+                },
+                tooltip: {
+                    trigger: 'item',
+                    textStyle: {
+                        fontSize: 18,
+                        fontFamily: '楷体',
+                    },
+                    formatter: '{b0} : {c0}<p style="font-size: 12px;font-family: 楷体,sans-serif">点击查看搭配的药物</p>'
+                },
+                series: [
+                    {
+                        name: '',
+                        type: 'pie',
+                        radius: [40, 180],
+                        center: ['50%', '50%'],
+                        itemStyle: {
+                            borderRadius: 4
+                        },
+                        label: {
+                            fontSize: 16,
+                            fontFamily: '楷体',
+                        },
+                        data: [],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            }
+            $.ajax({
+                url: "/amount/pie/",
+                type: "get",
+                dataType: "JSON",
+                data: {
+                    'amount': amount,
+                },
+                success: function (res) {
+                    option.series[0].data = res.data;
+                    myChart2.setOption(option)
+                }
+            })
+            myChart2.on('click', function (params) {
+                option.title.text = params.name;
+                myChart2.setOption(option)
+                initBar2(params.name)
+                transit([params.name])
+                table([params.name], 1)
+            })
+        }
+
+
+        function initBar2(medicine) {
+            if (myChart3 != null && myChart3 !== "" && myChart3 !== undefined) {
+                myChart3.dispose();
+            }
+            myChart3 = echarts.init(document.getElementById('bar2'));
+
+            const option = {
+                title: {
+                    text: "与" + medicine + "搭配的药物",
+                    x: 'center',
+                    y: 'top',
+                    textStyle: {
+                        fontSize: 20,
+                        fontFamily: '楷体',
+                    },
+                },
+                textStyle: {
+                    fontFamily: '楷体',
+                    fontSize: 24
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow',
+                        shadowStyle: {
+                            opacity: 1,
+                            color: 'rgba(150,150,150,0.3)'
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 20
+                    },
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: [],
+                        axisTick: {
+                            alignWithLabel: true
+                        },
+                        axisLabel: {
+                            fontSize: 14,
+                            rotate: -90
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '数量',
+                        type: 'bar',
+                        barWidth: '60%',
+                        barMaxWidth: 50,
+                        itemStyle: {
+                            color: '#c0a16b'
+                        },
+                        data: []
+                    }
+                ]
+            };
+            $.ajax({
+                url: "/match/bar/",
+                type: "get",
+                dataType: "JSON",
+                data: {
+                    "medicine": medicine,
+                },
+                success: function (res) {
+                    console.log(res)
+                    if (res.data1.length === 0) {
+                        document.getElementById('bar2').innerText = "无搭配使用药物"
+                    } else {
+                        option.xAxis[0].data = res.data1;
+                        option.series[0].data = res.data2;
+                        myChart3.setOption(option)
+                    }
+
+                }
+            })
+            myChart3.on('click', function (params) {
+                transit([medicine, params.name])
+                table([medicine, params.name], 1)
+            })
+        }
+    </script>
+{% endblock %}

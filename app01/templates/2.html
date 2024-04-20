@@ -1,0 +1,274 @@
+{% extends 'test.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/2.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <p class="interview">归经，即药物作用的经络，一般采用十二脏腑经络法表述，有心、肝、脾、肺、肾、胃、大肠、小肠、膀胱、胆、心包、三焦经等。</p>
+        <div style="width:800px;height: 600px" id="Nightingale_Chart"></div>
+    </div>
+    <div class="container">
+        <div class="itd">
+            <h3>四气五味</h3>
+            <div class="content">
+                <p>四气，指药物有寒、热、温、凉四种特性，又称四性。另外还有平性，即药性平和，一般寒凉药多具清热、解毒作用，而温热药多具温中、散寒作用，故《神农本草经》云“疗寒以热药，疗热以寒药”。</p>
+            </div>
+            <div class="content">
+                <p>五味，即辛、甘、酸、苦、咸五种滋味，最初由根据药物的真实滋味判别，后来大多根据临床治疗的效果确定</p>
+                <ul>
+                    <li>辛 有发散解表，行气行血作用</li>
+                    <li>甘 有滋补和中，调和药性及缓急止痛作用</li>
+                    <li>酸 有收敛固涩作用</li>
+                    <li>苦 有清泄燥湿作用</li>
+                    <li>咸 有泻下、软坚散结作用</li>
+                </ul>
+            </div>
+        </div>
+        <input type="button" id="transform" value="点击此处切换图形" class="btn1">
+        <h3>性味图</h3>
+        <div class="stack" style="width:800px;height: 450px" id="stack_bar"></div>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block js %}
+    <script type="text/javascript">
+        var decision = 0
+
+        $(function () {
+            initStackPar()
+            initPie()
+
+        })
+
+        function initStackPar() {
+            var data_list = [];
+            var wei_list = [];
+            var xing_list = [];
+            $.ajax({
+                url: "/stacked/bar/",
+                type: 'get',
+                async: false,
+                dataType: "JSON",
+                success: function (res) {
+                    wei_list = res.data3;
+                    xing_list = res.data2;
+                    for (let i = 0; i <= 5; ++i) {
+                        var dict = {
+                            name: '',
+                            type: 'bar',
+                            stack: 'total',
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            universalTransition: {
+                                enabled: true,
+                                delay: function (idx, count) {
+                                    return Math.random() * 400;
+                                }
+                            },
+                            data: []
+                        };
+                        dict.name = res.data1[i][0]
+                        dict.data = res.data1[i][1]
+                        data_list.push(dict)
+
+                        {#myChart.setOption(barOption)#}
+
+                    }
+                }
+            });
+            const myChart = echarts.init(document.getElementById('stack_bar'));
+            const barOption = {
+                tooltip: {
+                    trigger: 'item',
+                    axisPointer: {
+                        // Use axis to trigger tooltip
+                        type: 'shadow', // 'shadow' as default; can also be 'line' or 'shadow'
+                    },
+                    {#extraCssText:'width:200px;height:250px;',#}
+
+                    {#triggerOn: 'click',#}
+                    textStyle: {
+                        fontSize: 18
+                    },
+                    formatter: function (params) {
+                        {#console.log(params)#}
+                        var content = '1'
+                        var name = params.name
+                        var seriesname = params.seriesName
+                        var value = params.value
+                        var str1 = seriesname + ':' + value
+                        $.ajax({
+                            url: '/deyial/get/',
+                            type: 'get',
+                            data: {
+                                wei: params.name,
+                                x: params.seriesName
+                            },
+                            dataType: 'JSON',
+                            async: false,
+                            success: function (res) {
+                                content = res.data
+
+                            }
+                        })
+                        var html = '<h3>' + name + '</h3>' + '<p>' + str1 + '</p>' + '<div>' + content + '</div>'
+                        console.log(content)
+                        return html
+                    }
+                },
+                textStyle: {
+                    fontSize: 25,
+                    fontFamily: '隶书'
+                },
+                legend: {
+                    left: '89%',
+                    top: '20%',
+                },
+                grid: {
+                    left: '3%',
+                    right: '10%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['甘', '酸', '苦', '辛', '咸'],
+                    axisLabel: {
+                        fontSize: 18,
+
+                    }
+                },
+                barWidth: 35,
+                color: ['#00BFFF', '#ADD8E6', '#CDAA7D', '#FFA54F', '#FF7F50', '#FF0000'],
+                series: data_list
+            };
+            const scatterOption = (pieOption = {
+
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)',
+                    textStyle: {
+                        fontFamily: '楷体',
+                        fontSize: 16
+                    }
+                },
+                series: [
+                    {
+                        universalTransition: {
+                            enabled: true,
+                            delay: function (idx, count) {
+                                return Math.random() * 400;
+                            }
+                        },
+                        colorBy: 'data',
+                        name: '性味',
+                        type: 'pie',
+                        selectedMode: 'single',
+                        radius: [0, '35%'],
+                        label: {
+                            position: 'inner',
+                            fontSize: 14,
+                            fontFamily: '楷体'
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: wei_list,
+                    },
+                    {
+                        name: '性味',
+                        type: 'pie',
+                        color: ['#ADD8E6', '#CDAA7D', '#FFA54F', '#FF7F50', '#FF0000', '#00BFFF'],
+                        radius: ['45%', '75%'],
+                        itemStyle: {
+                            borderRadius: 5,
+                            borderColor: '#fff',
+                            {#borderWidth: 2#}
+                        },
+                        labelLine: {
+                            length: 30
+                        },
+                        label: {
+                            fontFamily: '楷体',
+                            fontSize: 17,
+                        },
+                        data: xing_list
+                    }
+                ]
+            });
+            myChart.setOption(scatterOption, true);
+            let currentOption = scatterOption;
+            $("#transform").click(function () {
+                currentOption = currentOption === scatterOption ? barOption : scatterOption;
+                myChart.setOption(currentOption, true);
+            });
+            {#myChart.setOption(barOption)#}
+        }
+
+        function initPie() {
+            const myChart = echarts.init(document.getElementById('Nightingale_Chart'))
+            const option = {
+                title: {
+                    text: '',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b} : {c} ',
+                    textStyle: {
+                        fontFamily: '楷体',
+                        fontSize: 16,
+                    }
+                },
+                legend: {
+                    right: 25,
+                    orient: 'vertical',
+                    top: 'center',
+                    textStyle: {
+                        fontSize: 16,
+                        fontFamily: '楷体'
+                    }
+                },
+                series: [
+                    {
+                        name: '归经',
+                        type: 'pie',
+                        radius: [30, 200],
+                        center: ['50%', '50%'],
+                        roseType: 'area',
+                        itemStyle: {
+                            borderRadius: 5
+                        },
+                        label: {
+                            fontFamily: '楷体',
+                            fontSize: 16,
+                        },
+                        data: []
+                    }
+                ]
+            }
+            $.ajax({
+                url: "/taste/pie/",
+                type: 'get',
+                dataType: "JSON",
+                success: function (res) {
+                    option.series[0].data = res.data
+                    myChart.setOption(option)
+                }
+            })
+
+
+        }
+
+
+    </script>
+{% endblock %}
