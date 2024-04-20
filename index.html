@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <base href="/">
+
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <title>index</title>
+
+    <style>
+        body {
+            background: url("../static/img/29(index).png") fixed no-repeat center center;
+            background-size: cover;
+        }
+
+    </style>
+</head>
+<body>
+{#<div style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;opacity: 1;z-index: 1">#}
+{#    <img src="../static/img/29.png" width="100%" height="100%"/>#}
+{#</div>#}
+<div class="content">
+    <p class="interview">&emsp;&emsp;《神农本草经》又称《本草经》或者《本经》，是中国四大经典著作之一，为秦汉时期之人托"神农"之名而作。全书共记载药物365种，根据药物特性和功效将药物分为上、中、下三品，又根据药物的药性和药味首创"四气""五味"理论，系统总结了秦汉及以前的药学知识与用药规则，为中药学和方剂学的发展奠定了基础。</p>
+</div>
+<div class="index">
+    <button class="btn" onclick="window.location.href='/classify/show/'">初识《本经》</button>
+    <button class="btn" onclick="window.location.href='/taste/show/'">归经·性味</button>
+    <button class="btn" onclick="window.location.href='/usage/show/'">《本经》与《伤寒论》</button>
+</div>
+
+</body>
+</html>
